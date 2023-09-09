@@ -13,11 +13,13 @@ import { isAuth, saveOTPToRedis, verifyOtp } from "../utils.js";
 import otpGenerator from "otp-generator";
 import Transaction from "../models/transactionModel.js";
 import { smsNotification } from "../services/NotificationService.js";
+import { validateCompleteTransaction, validateMoveFund } from "../services/ValidationService.js";
 
 const transactionRoutes = express.Router();
 transactionRoutes.post(
   "/move-funds",
   isAuth,
+  validateMoveFund,
   expressAsyncHandler(async (req, res) => {
     //Validate agent Transaction Pin
     const validatePin = await validateAgentPin(req.user?._id, req.body.pin);
@@ -107,6 +109,7 @@ transactionRoutes.post(
 transactionRoutes.post(
   "/complete-transaction",
   isAuth,
+  validateCompleteTransaction,
   expressAsyncHandler(async (req, res) => {
     //Validate OTP
     const otpValidate = verifyOtp(req?.body?.transactionId, req.body.otp)
